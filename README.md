@@ -1,4 +1,4 @@
-Ever Heared It
+Shazam
 ===============
 
 Small music-fingerprinting web app that downloads audio from Spotify/YouTube, fingerprints tracks, and matches songs locally.
