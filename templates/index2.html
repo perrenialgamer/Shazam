@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Match | Pro Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #00f2ff;
+            --secondary: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --card-bg: rgba(15, 23, 42, 0.6);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #020617;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* Animated Mesh Gradient Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(at 0% 0%, rgba(112, 0, 255, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 242, 255, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.2) 0px, transparent 50%);
+            animation: meshMove 15s ease infinite alternate;
+        }
+
+        @keyframes meshMove {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+
+        .studio-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 3rem;
+            width: 90%;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+            position: relative;
+        }
+
+        /* Label Styling */
+        .label {
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3));
+        }
+
+        #status {
+            color: var(--text-dim);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        /* Visualizer */
+        .viz-box {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .bar {
+            width: 6px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px var(--accent);
+            opacity: 0.4;
+        }
+
+        /* Action Button */
+        .btn-outer {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .record-btn {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 30px rgba(0, 242, 255, 0.3);
+        }
+
+        .record-btn svg { fill: white; width: 32px; height: 32px; transition: 0.3s; }
+
+        .record-btn:hover { transform: scale(1.05) translateY(-5px); }
+
+        .recording-pulse {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: var(--accent);
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        /* Active State Animations */
+        .recording .record-btn {
+            background: #ff0055;
+            box-shadow: 0 0 50px rgba(255, 0, 85, 0.6);
+        }
+
+        .recording .recording-pulse {
+            animation: sonar 2s infinite;
+        }
+
+        @keyframes sonar {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        #result {
+            margin-top: 3rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 1rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--accent);
+        }
+
+        /* Glass Text Reflection */
+        .reflection {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+            border-radius: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+
+<div class="studio-card">
+    <div class="reflection"></div>
+    <span class="label">Audio Intelligence</span>
+    <h1>Studio</h1>
+    <p id="status">Ready for input</p>
+
+    <div class="viz-box" id="visualizer">
+        </div>
+
+    <div class="btn-outer" id="btnParent">
+        <button id="listenBtn" class="record-btn">
+            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </button>
+        <div class="recording-pulse"></div>
+    </div>
+
+    <div id="result">Waiting for signal...</div>
+    <p style="margin-top:1rem">
+        <a href="http://127.0.0.1:5000/" style="display:inline-block;margin-top:8px;padding:10px 16px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--secondary));color:#fff;text-decoration:none;font-weight:700;">Switch to Downloader</a>
+    </p>
+</div>
+
+<script>
+    const vizBox = document.getElementById('visualizer');
+    const btn = document.getElementById('listenBtn');
+    const btnParent = document.getElementById('btnParent');
+    const statusText = document.getElementById('status');
+    const resultText = document.getElementById('result');
+    
+    // Create Visualizer Bars
+    for(let i=0; i<12; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        vizBox.appendChild(bar);
+    }
+    const bars = document.querySelectorAll('.bar');
+
+    let vizInterval;
+    function startAnimate() {
+        vizInterval = setInterval(() => {
+            bars.forEach(bar => {
+                const h = Math.random() * 60 + 10;
+                bar.style.height = h + 'px';
+                bar.style.opacity = '1';
+                bar.style.background = '#ff0055';
+                bar.style.boxShadow = '0 0 20px #ff0055';
+            });
+        }, 100);
+    }
+
+    function stopAnimate() {
+        clearInterval(vizInterval);
+        bars.forEach(bar => {
+            bar.style.height = '8px';
+            bar.style.opacity = '0.4';
+            bar.style.background = 'var(--accent)';
+            bar.style.boxShadow = '0 0 15px var(--accent)';
+        });
+    }
+
+    btn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            let chunks = [];
+
+            // UI Transitions
+            btnParent.classList.add('recording');
+            statusText.innerText = "CAPTURING SIGNAL...";
+            statusText.style.color = "#ff0055";
+            resultText.innerText = "Analyzing live feed...";
+            startAnimate();
+
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                stopAnimate();
+                btnParent.classList.remove('recording');
+                statusText.innerText = "PROCESSING...";
+                statusText.style.color = "var(--text-dim)";
+                
+                const blob = new Blob(chunks, { type: 'audio/webm' });
+                const formData = new FormData();
+                formData.append('file', blob);
+
+                const res = await fetch('/process_audio', { method: 'POST', body: formData });
+                const data = await res.json();
+                resultText.innerText = data.result || "NO MATCH DETECTED";
+                statusText.innerText = "READY FOR INPUT";
+            };
+
+            mediaRecorder.start();
+            setTimeout(() => mediaRecorder.stop(), 10000);
+
+        } catch (e) {
+            statusText.innerText = "MIC ACCESS DENIED";
+        }
+    });
+</script>
+</body>
+</html>
