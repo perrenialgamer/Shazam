@@ -16,7 +16,7 @@ pip install -r requirements.txt
 - **Run** the app:
 
 ```powershell
-python -m app
+python run_both.py
 ```
 
 - **Web UI**: open http://127.0.0.1:5000 (or the address printed by Flask).
@@ -40,11 +40,6 @@ pip install -U yt-dlp
   - Ensure `ffmpeg` is installed and on `PATH`.
   - If you hit HTTP 403 for certain formats, try adding HLS/headers options or cookies. Example command-line test:
 
-```bash
-yt-dlp -f bestaudio --hls-prefer-native --hls-use-mpegts --allow-unplayable-formats \
-  --add-header "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
-  -o "out.%(ext)s" "https://youtube.com/watch?v=k232IRh2tEE"
-```
 
   - To use browser cookies for restricted content, export cookies to `cookies.txt` (standard Netscape format) and add `cookiefile: "cookies.txt"` to `ydl_opts` in `download_songs/youtube.py`.
 
